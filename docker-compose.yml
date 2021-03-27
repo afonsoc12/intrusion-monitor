@@ -1,0 +1,64 @@
+
+version: '3.5'
+
+services:
+# ==================================================
+# Python-geohash
+# ==================================================
+    python-geossh:
+        build: geossh
+        image: geossh:latest
+        container_name: geossh
+        depends_on:
+            influxdb:
+                condition: service_healthy
+        environment:
+            - API_KEY=${GEOSSH_API_KEY}
+            - INFLUX_HOST=${GEOSSH_INFLUX_HOST}
+            - INFLUX_DB=${GEOSSH_INFLUX_DB}
+            - INFLUX_PORT=${GEOSSH_INFLUX_PORT}
+        ports:
+            - 7007:7007
+        networks:
+            - monitoring
+        restart: ${RESTART_POLICY}
+
+# ==================================================
+# Grafana
+# ==================================================
+#    grafana:
+#        image: grafana/grafana:latest
+#        container_name: grafana
+#        #user: ${PUID}
+#        volumes:
+#            - ${APPDATA_PATH}/grafana:/var/lib/grafana
+#        ports:
+#            - 3000:3000
+#        networks:
+#            - monitoring
+#        restart: ${RESTART_POLICY}
+
+# ==================================================
+# InfluxDB
+# ==================================================
+#    influxdb:
+#      image: influxdb:1.8.4
+#      container_name: influxdb
+#        healthcheck: # Allow influx to start before telegraf
+#            test: ["CMD", "curl", "-f", "http://influxdb:8086/health"]
+#            interval: 10s
+#            timeout: 10s
+#            retries: 5
+#            start_period: 5s
+#        volumes:
+#            - ${APPDATA_PATH}/influxdb:/var/lib/influxdb
+#        ports:
+#            - 8086:8086
+#        networks:
+#            - monitoring
+#        restart: ${RESTART_POLICY}
+
+networks:
+    monitoring:
+        name: monitoring
+        driver: bridge
