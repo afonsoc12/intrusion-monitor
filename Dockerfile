@@ -2,7 +2,7 @@ FROM python:3.7-alpine
 
 ARG VERSION=$(echo $(python -c "import versioneer; print(versioneer.get_versions()['version'])"))
 
-LABEL VERSION=VERSION
+LABEL VERSION=${VERSION}
 
 MAINTAINER Afonso Costa
 
