@@ -8,10 +8,6 @@ import server
 from log_parser import LogLine
 from watchdog import Watchdog
 
-logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S',
-                    level=logging.DEBUG)
-
 
 def main():
 
@@ -30,14 +26,25 @@ def main():
         logging.info(f'Using OPERATION_MODE={OPERATION_MODE}')
 
     if OPERATION_MODE == 'watchdog':
-        #todo: check if has opening permissions
-        log_path = Path('test.log')
+
+        log_path = Path(os.getenv('SSH_LOG_PATH', '/watchdog/log/auth.log'))
+
+        # Check if file exists and can be read
         if not log_path.exists():
             logging.critical(f'No file was found and this can\'t continue. Log path provided is: {log_path}')
             exit(127)
+        elif not os.access(log_path, os.R_OK):
+            logging.critical(f'The file cant be opened. Running: "sudo chmod o+r <Log file>" might solve this issue.')
+            exit(128)
         else:
-            logging.debug(f'Log file found at: {log_path}')
+            logging.info(f'Log file found at: {log_path}')
+            with open(log_path, 'r') as f:
+                lines = f.readlines()
+                logging.debug('Here are the last 5 lines of the log file:\n\t{}'.format('\t'.join(lines[-5:])))
+
+            # Everything seems okay, starting watchdog
             watchdog = Watchdog(log_path)
+            logging.debug(f'So far so good, starting log Watchdog...')
             watchdog.start()
     elif OPERATION_MODE == 'socket':
         server.start()
@@ -77,5 +84,20 @@ def exit(exit_code):
 
     sys.exit(exit_code)
 
+
 if __name__ == "__main__":
+    log_level = os.getenv('LOG_LEVEL', 'info')
+
+    if log_level.casefold() == 'debug':
+        log_level = logging.DEBUG
+    elif log_level.casefold() == 'info':
+        log_level = logging.INFO
+    else:
+        # Default
+        log_level = logging.INFO
+
+    logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S',
+                        level=log_level)
+
     main()

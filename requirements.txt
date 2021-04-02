@@ -3,8 +3,6 @@ chardet==4.0.0
 idna==2.10
 influxdb==5.3.1
 msgpack==1.0.2
-numpy==1.20.1
-pandas==1.2.3
 pygeohash==1.2.0
 python-dateutil==2.8.1
 pytz==2021.1

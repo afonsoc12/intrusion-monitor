@@ -2,6 +2,7 @@ import logging
 import time
 import os
 
+from db import InfluxDB
 from log_parser import LogLine
 
 SLEEP_SECONDS = 1
@@ -11,8 +12,19 @@ class Watchdog:
 
     def __init__(self, log_path):
         self.log_path = log_path
+        self.db = InfluxDB()
 
     def start(self):
+
+        logging.debug('Checking connection status...')
+        status = self.db.check_status()
+        if status:
+            logging.debug(f'Got connection successfully. InfluxDB version {status}')
+        else:
+            logging.error('Connection timmed out')
+            raise ConnectionError('Could not connect. Connection timed out')
+
+        # Start watching logs
         with open(self.log_path, 'r') as log_file:
             logging.debug(f'Opened context manager for file {self.log_path}')
             for new_lines in self.line_watcher(log_file):
@@ -22,6 +34,14 @@ class Watchdog:
 
                 for line in new_lines:
                     log_line = LogLine(line)
+                    line_class = log_line.is_login_attempt()
+                    if line_class[0]:
+                        logging.debug(f'Line is a login attempt. Reason: {line_class[1]}. Going to be processed...')
+                        ip_info = log_line.get_ip_info()
+                        self.db.write_log_line(log_line, ip_info)
+                        logging.debug('LogLine successfully written!')
+                    else:
+                        logging.debug(f'Line is not a login attempt. Reason: {line_class[1]}. Skipping...')
 
         logging.debug(f'Closed context manager to {self.log_path}')
         logging.info(f'Watchdog has stopped')
