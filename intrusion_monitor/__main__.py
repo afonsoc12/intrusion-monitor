@@ -30,13 +30,13 @@ def main():
 
         # Check if file exists and can be read
         if not log_path.exists():
-            logging.critical(f'No file was found and this can\'t continue. Log path provided is: {log_path}')
+            logging.critical(f'No file was found and this can\'t continue. Log path provided is: {log_path.absolute()}')
             exit(127)
         elif not os.access(log_path, os.R_OK):
             logging.critical(f'The file cant be opened. Running: "sudo chmod o+r <Log file>" might solve this issue.')
             exit(128)
         else:
-            logging.info(f'Log file found at: {log_path}')
+            logging.info(f'Log file found at: {log_path.absolute()}')
             with open(log_path, 'r') as f:
                 lines = f.readlines()
                 logging.debug('Here are the last 5 lines of the log file:\n\t{}'.format('\t'.join(lines[-5:])))
