@@ -2,8 +2,8 @@ import logging
 import time
 import os
 
-from db import InfluxDB
-from log_parser import LogLine
+from .db import InfluxDB
+from .log_parser import LogLine
 
 SLEEP_SECONDS = 1
 
@@ -38,8 +38,8 @@ class Watchdog:
                     if line_class[0]:
                         logging.debug(f'Line is a login attempt. Reason: {line_class[1]}. Going to be processed...')
                         ip_info = log_line.get_ip_info()
-                        self.db.write_log_line(log_line, ip_info)
-                        logging.debug('LogLine successfully written!')
+                        stored_data = self.db.write_log_line(log_line, ip_info)
+                        logging.info(f'Log line successfully written: {stored_data}')
                     else:
                         logging.debug(f'Line is not a login attempt. Reason: {line_class[1]}. Skipping...')
 

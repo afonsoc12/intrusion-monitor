@@ -4,9 +4,8 @@ import logging
 from datetime import date
 from pathlib import Path
 
-import server
-from log_parser import LogLine
-from watchdog import Watchdog
+#import server
+from .watchdog import Watchdog
 
 
 def main():

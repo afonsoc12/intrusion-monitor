@@ -106,6 +106,8 @@ class InfluxDB:
 
         self.conn.write_points(measure)
 
+        return measure
+
 
     @staticmethod
     @contextmanager

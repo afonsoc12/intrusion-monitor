@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 import pytz
 
-from utils import extract_ip_info
+from .utils import extract_ip_info
 
 TZ = pytz.timezone(os.getenv('TZ', 'Europe/London'))
 TZ_UTC = pytz.utc
