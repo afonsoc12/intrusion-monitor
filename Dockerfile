@@ -11,7 +11,7 @@ WORKDIR /src
 COPY . .
 
 RUN pip install -r requirements.txt
-RUN echo -e "def get_versions():\n    return {'version': ${VERSION}, 'full-revisionid': 'n/a', 'date': 'n/a', 'dirty': 'n/a', 'error': 'n/a'}" \
+RUN echo -e "def get_versions():\n    return {'version': '${VERSION}', 'full-revisionid': 'n/a', 'date': 'n/a', 'dirty': 'n/a', 'error': 'n/a'}" \
     > intrusion_monitor/_version.py
 
 EXPOSE 7007
