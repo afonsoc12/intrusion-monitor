@@ -2,25 +2,35 @@
 version: '3.5'
 
 services:
+
 # ==================================================
-# Python-geohash
+# Intrusion-monitor
 # ==================================================
-    python-geossh:
-        build: geossh
-        image: geossh:latest
-        container_name: geossh
-        depends_on:
-            influxdb:
-                condition: service_healthy
+    intrusion-monitor:
+        build: .
+        image: intrusion-monitor:dev-latest
+        container_name: intrusion-monitor
+        #depends_on:
+        #    influxdb:
+        #        condition: service_healthy
         environment:
-            - API_KEY=${GEOSSH_API_KEY}
-            - INFLUX_HOST=${GEOSSH_INFLUX_HOST}
-            - INFLUX_DB=${GEOSSH_INFLUX_DB}
-            - INFLUX_PORT=${GEOSSH_INFLUX_PORT}
+            - TZ=Europe/London
+            - API_KEY=${INTRUSION_MONITOR_API_KEY}
+            - INFLUXDB_HOST=${INTRUSION_MONITOR_INFLUXDB_HOST}
+            - INFLUXDB_DATABASE=${INTRUSION_MONITOR_INFLUXDB_DATABASE}
+            - INFLUXDB_PORT=${INTRUSION_MONITOR_INFLUXDB_PORT}
+            - INFLUXDB_USER=${INTRUSION_MONITOR_INFLUXDB_USER}
+            - INFLUXDB_PASSWORD=${INTRUSION_MONITOR_INFLUXDB_PASSWORD}
+            - OPERATION_MODE=watchdog
+            #- SSH_LOG_PATH=
+            #- LOG_LEVEL=debug
+        volumes:
+            - /var/log/ssh-intrusion.log:/watchdog/log/auth.log
         ports:
             - 7007:7007
         networks:
             - monitoring
+        command: "cat /src/intrusion_monitor/_version.py"
         restart: ${RESTART_POLICY}
 
 # ==================================================
