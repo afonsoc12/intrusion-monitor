@@ -5,6 +5,7 @@ from datetime import date
 from pathlib import Path
 
 #import server
+from ._version import get_versions
 from .watchdog import Watchdog
 
 
@@ -12,6 +13,7 @@ def main():
 
     logging.info(f'Copyright {date.today().year} Afonso Costa')
     logging.info('Licensed under the Apache License, Version 2.0 (the "License");')
+    logging.info('Version: {}'.format(get_versions()['version']))
 
     # Select if working as a TCP socket (for rsyslog) or as a log watchdog (default)
     OPERATION_MODE = os.getenv('OPERATION_MODE')
@@ -99,4 +101,8 @@ if __name__ == "__main__":
                         datefmt='%Y-%m-%d %H:%M:%S',
                         level=log_level)
 
-    main()
+    try:
+        main()
+    except Exception as e:
+        logging.critical('An exception ocurred', exc_info=True)
+        exit(250)

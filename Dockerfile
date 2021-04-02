@@ -1,6 +1,8 @@
 FROM python:3.7-buster
 
-WORKDIR /app
+MAINTAINER Afonso Costa
+
+WORKDIR /src
 
 COPY . .
 
@@ -8,4 +10,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE 7007
 
-CMD [ "python", "-u", "server.py" ]
+ENTRYPOINT [ "python", "-m", "intrusion_monitor" ]
