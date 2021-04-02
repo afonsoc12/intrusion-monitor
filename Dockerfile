@@ -1,6 +1,6 @@
 FROM python:3.7-alpine
 
-ARG VERSION=$(echo $(python -c "import versioneer; print(versioneer.get_versions()['version'])"))
+ARG VERSION=$(echo $(python -c "import versioneer; print(versioneer.get_versions()['version']).replace('+', '-')"))
 
 LABEL VERSION=${VERSION}
 
