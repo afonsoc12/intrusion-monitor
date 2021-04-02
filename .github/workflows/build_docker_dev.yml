@@ -30,8 +30,8 @@ jobs:
         with:
           context: .
           file: Dockerfile
-          build-args:
-            VERSION: dev-v${{ env.VERSION }}
+          build-args: |
+            VERSION=dev-v${{ env.VERSION }}
           platforms: linux/amd64,linux/arm64
           push: true
           tags: afonsoc12/intrusion-monitor:dev-latest,afonsoc12/intrusion-monitor:dev-v${{ env.VERSION }}
