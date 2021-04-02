@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Get version from versioneer
         run: |
-          VER=$(echo $(python -c "import versioneer; print(versioneer.get_versions()['version']).replace('+', '-')"))
+          VER=$(echo $(python -c "import versioneer; print(versioneer.get_versions()['version'].replace('+', '-'))"))
           echo "VERSION=$VER" >> $GITHUB_ENV
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
