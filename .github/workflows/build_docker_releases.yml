@@ -1,4 +1,4 @@
-name: CI for tagged releases
+name: CI releases
 on:
   push:
     tags:

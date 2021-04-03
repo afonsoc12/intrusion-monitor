@@ -1,4 +1,4 @@
-name: CI for latest on master branch
+name: CI development
 
 on:
    push:
@@ -27,11 +27,9 @@ jobs:
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: true
           draft: true
-          automatic_release_tag: "latest"
           files: |
-            build/intrusion*
+            dist/intrusion*
 
   docker:
     name: Builds docker image and pushes to Docker Hub
