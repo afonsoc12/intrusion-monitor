@@ -1,8 +1,11 @@
 name: CI development
 
 on:
-   push:
-      branches: master
+  push:
+    branches:
+      - master
+    tags-ignore:
+      - '**'
 
 jobs:
 
