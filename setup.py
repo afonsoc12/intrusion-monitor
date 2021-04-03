@@ -9,7 +9,7 @@ setuptools.setup(
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     author="Afonso Costa",
-    description="Your single solution for export",
+    description="An SSH log watchdog, which exports failed login attempts to an InfluxDB timeseries database.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/afonsoc12/intrusion-monitor",
