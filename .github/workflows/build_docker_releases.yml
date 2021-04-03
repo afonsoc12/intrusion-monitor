@@ -29,6 +29,7 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
+          title: "v${{ env.VERSION }}"
           files: |
             build/intrusion*
 
@@ -56,6 +57,7 @@ jobs:
         with:
           context: .
           file: Dockerfile
+          no-cache: true
           platforms: linux/amd64,linux/arm64
           push: true
           tags: afonsoc12/intrusion-monitor:latest,afonsoc12/intrusion-monitor:v${{ env.VERSION }}

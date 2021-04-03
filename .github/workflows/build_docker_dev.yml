@@ -28,7 +28,8 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "dev-latest"
-          draft: true
+          prerelease: true
+          title: "dev-v${{ env.VERSION }}"
           files: |
             dist/intrusion*
 
