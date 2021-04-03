@@ -1,4 +1,5 @@
 ![](./res/images/server.png)
+
 # Intrusion Monitor
 An SSH log watchdog, which exports failed login attempts to an InfluxDB timeseries database.
 
