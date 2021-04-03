@@ -36,7 +36,7 @@ jobs:
           prerelease: false
           title: "v${{ env.VERSION }}"
           files: |
-            build/intrusion*
+            dist/intrusion*
 
   docker:
     name: Builds docker image and pushes to Docker Hub
