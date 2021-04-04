@@ -68,6 +68,8 @@ jobs:
         with:
           context: .
           file: Dockerfile
+          build-args: |
+            VERSION=v${{ env.VERSION }}
           no-cache: true
           platforms: linux/amd64,linux/arm64
           push: true
