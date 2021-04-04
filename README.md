@@ -106,7 +106,7 @@ services:
         restart: unless-stopped
 ```
 
-If you would like to create a stack with both [intrusion-monitor](https://github.com/afonsoc12/intrusion-monitor) and InfluxDB, you can either fork this repo or download the [docker-compose.yml`](https://github.com/afonsoc12/intrusion-monitor/blob/master/docker-compose.yml) and [`.env.sample](https://github.com/afonsoc12/intrusion-monitor/blob/master/.env.sample) files (rename the latter to `.env`).
+  If you would like to create a stack with both [intrusion-monitor](https://github.com/afonsoc12/intrusion-monitor) and InfluxDB, you can either fork this repo or download the [`docker-compose.yml`](https://github.com/afonsoc12/intrusion-monitor/blob/master/docker-compose.yml) and [`env.sample`](https://github.com/afonsoc12/intrusion-monitor/blob/master/.env.sample) files (rename the latter to `.env`).
 
 Don't forget to edit your `.env`! Then run it with:
 ```shell
@@ -125,7 +125,7 @@ If you would like to know more about environment variables in Docker, please see
 | --- | --- | --- | --- |
 | `-e TZ` |  | Specify the system's timezone | Europe/London |
 | `-e OPERATION_MODE` |  | Operation mode | watchdog |
-| `-e API_KEY` | ✔️ |[IPstack](https://ipstack.com) API key (don't worry, its free!). | -- |
+| `-e API_KEY` | ✔ |[IPstack](https://ipstack.com) API key (don't worry, its free!). | -- |
 | `-e INFLUXDB_HOST` | ✔ | InfluxDB database host. It can be the container name, if both are in the same network. *See [docker-compose.yml](./docker-compose.yml)* | localhost |
 | `-e INFLUXDB_PORT` |  | InfluxDB port | 8086 |
 | `-e INFLUXDB_DATABASE` |  | InfluxDB database name. Creates a new one if does not exist | intrusion-monitor |
@@ -133,7 +133,7 @@ If you would like to know more about environment variables in Docker, please see
 | `-e INFLUXDB_PASSWORD` |  | InfluxDB password | *optional* |
 | `-e LOG_LEVEL` |  | Log level. Supports "debug" or "info" | info |
 | `-p 7007:7007` |  | TCP socket port *(under development)* | -- |
-| `-v /var/log/auth.log:/watchdog/log/auth.log:ro` | ✔️ <br>(in watchdog mode) | Map to the log file, in read-only mode. | *mandatory* |
+| `-v /var/log/auth.log:/watchdog/log/auth.log:ro` | ✔<br>(in watchdog mode) | Map to the log file, in read-only mode. | *mandatory* |
 
 <!-- 
 # Grafana Dashboard
