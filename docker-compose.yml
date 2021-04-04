@@ -1,4 +1,3 @@
-
 version: '3.5'
 
 services:
@@ -6,69 +5,52 @@ services:
 # ==================================================
 # Intrusion-monitor
 # ==================================================
-    intrusion-monitor:
-        build: .
-        image: intrusion-monitor:dev-latest
-        container_name: intrusion-monitor
-        #depends_on:
-        #    influxdb:
-        #        condition: service_healthy
-        environment:
-            - TZ=Europe/London
-            - API_KEY=${INTRUSION_MONITOR_API_KEY}
-            - INFLUXDB_HOST=${INTRUSION_MONITOR_INFLUXDB_HOST}
-            - INFLUXDB_DATABASE=${INTRUSION_MONITOR_INFLUXDB_DATABASE}
-            - INFLUXDB_PORT=${INTRUSION_MONITOR_INFLUXDB_PORT}
-            - INFLUXDB_USER=${INTRUSION_MONITOR_INFLUXDB_USER}
-            - INFLUXDB_PASSWORD=${INTRUSION_MONITOR_INFLUXDB_PASSWORD}
-            - OPERATION_MODE=watchdog
-            #- SSH_LOG_PATH=
-            #- LOG_LEVEL=debug
-        volumes:
-            - /var/log/ssh-intrusion.log:/watchdog/log/auth.log
-        ports:
-            - 7007:7007
-        networks:
-            - monitoring
-        command: "cat /src/intrusion_monitor/_version.py"
-        restart: ${RESTART_POLICY}
-
-# ==================================================
-# Grafana
-# ==================================================
-#    grafana:
-#        image: grafana/grafana:latest
-#        container_name: grafana
-#        #user: ${PUID}
-#        volumes:
-#            - ${APPDATA_PATH}/grafana:/var/lib/grafana
-#        ports:
-#            - 3000:3000
-#        networks:
-#            - monitoring
-#        restart: ${RESTART_POLICY}
+  intrusion-monitor:
+    image: afonsoc12/intrusion-monitor:latest
+    container_name: intrusion-monitor
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    environment:
+      - TZ=${INTRUSION_MONITOR_TZ}
+      - API_KEY=${INTRUSION_MONITOR_API_KEY}
+      - INFLUXDB_HOST=${INTRUSION_MONITOR_INFLUXDB_HOST}
+      - INFLUXDB_PORT=${INTRUSION_MONITOR_INFLUXDB_PORT}
+      - INFLUXDB_DATABASE=${INTRUSION_MONITOR_INFLUXDB_DATABASE}
+      - INFLUXDB_USER=${INTRUSION_MONITOR_INFLUXDB_USER}
+      - INFLUXDB_PASSWORD=${INTRUSION_MONITOR_INFLUXDB_PASSWORD}
+      - OPERATION_MODE=${INTRUSION_MONITOR_OPERATION_MODE}
+      - LOG_LEVEL=${INTRUSION_MONITOR_LOG_LEVEL}
+    volumes:
+      - ${INTRUSION_MONITOR_AUTH_LOG}:/watchdog/log/auth.log
+    ports:
+      - 7007:7007
+    networks:
+      - monitoring
+    restart: ${RESTART_POLICY}
 
 # ==================================================
 # InfluxDB
 # ==================================================
-#    influxdb:
-#      image: influxdb:1.8.4
-#      container_name: influxdb
-#        healthcheck: # Allow influx to start before telegraf
-#            test: ["CMD", "curl", "-f", "http://influxdb:8086/health"]
-#            interval: 10s
-#            timeout: 10s
-#            retries: 5
-#            start_period: 5s
-#        volumes:
-#            - ${APPDATA_PATH}/influxdb:/var/lib/influxdb
-#        ports:
-#            - 8086:8086
-#        networks:
-#            - monitoring
-#        restart: ${RESTART_POLICY}
+  influxdb:
+    # Don't use InfluxDB v2, as I haven't tested it yet. This is the latest of v1.X
+    image: influxdb:1.8.4
+    container_name: influxdb
+      healthcheck: # Allow influx to start before intrusion-monitor
+        test: ["CMD", "curl", "-f", "http://influxdb:8086/health"]
+        interval: 10s
+        timeout: 10s
+        retries: 5
+        start_period: 5s
+      volumes:
+        - ${APPDATA_PATH}/influxdb:/var/lib/influxdb
+      ports:
+        - 8086:8086
+      networks:
+        - monitoring
+      restart: ${INTRUSION_MONITOR_RESTART_POLICY}
 
 networks:
-    monitoring:
-        name: monitoring
-        driver: bridge
+  monitoring:
+    name: monitoring
+    driver: bridge
