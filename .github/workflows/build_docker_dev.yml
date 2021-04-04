@@ -2,10 +2,12 @@ name: CI development
 
 on:
   push:
-    tags-ignore:
-      - 'v*'
     branches:
       - master
+    tags-ignore:
+      - '**'
+    paths-ignore:
+      - '*'
 
 jobs:
 
