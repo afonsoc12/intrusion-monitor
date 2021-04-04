@@ -38,6 +38,7 @@ jobs:
           prerelease: true
           title: "dev-v${{ env.VERSION }}"
           files: |
+            LICENSE
             dist/intrusion*
 
   docker:
