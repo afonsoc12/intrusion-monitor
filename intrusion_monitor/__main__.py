@@ -4,16 +4,36 @@ import logging
 from datetime import date
 from pathlib import Path
 
-#import server
 from ._version import get_versions
 from .watchdog import Watchdog
+
+# Environment variables and is required
+ENVIRONMENT_VARS = {'TZ': False,
+                    'API_KEY': True,
+                    'INFLUXDB_HOST': False,
+                    'INFLUXDB_PORT': False,
+                    'INFLUXDB_DATABASE': False,
+                    'INFLUXDB_USER': False,
+                    'INFLUXDB_PASSWORD': False,
+                    'OPERATION_MODE': False,
+                    'SSH_LOG_PATH': False,
+                    'LOG_LEVEL': False}
 
 
 def main():
 
+    # Setup logging
+    logging_setup()
+
     logging.info(f'Copyright {date.today().year} Afonso Costa')
     logging.info('Licensed under the Apache License, Version 2.0 (the "License");')
     logging.info('Version: {}'.format(get_versions()['version']))
+
+    # Unset empty variables
+    unset_empty_env(ENVIRONMENT_VARS)
+
+    # Check if required variables are present
+    check_vars_exist(ENVIRONMENT_VARS)
 
     # Select if working as a TCP socket (for rsyslog) or as a log watchdog (default)
     OPERATION_MODE = os.getenv('OPERATION_MODE')
@@ -48,45 +68,29 @@ def main():
             logging.debug(f'So far so good, starting log Watchdog...')
             watchdog.start()
     elif OPERATION_MODE == 'socket':
-        server.start()
+        logging.critical(
+            f'This feature is not yet implemented and this can\'t continue. OPERATION_MODE is {OPERATION_MODE}')
+        raise NotImplementedError(f'The OPERATION_MODE={OPERATION_MODE} is not yet implemented.')
+        # server.start()
     else:
-        logging.critical(f'A critical problem occurred while handling OPERATION_MODE and this can\'t continue. OPERATION_MODE is {OPERATION_MODE}')
+        logging.critical(
+            f'A critical problem occurred while handling OPERATION_MODE and this can\'t continue. OPERATION_MODE is {OPERATION_MODE}')
         raise EnvironmentError('A problem occurred while handling OPERATION_MODE environment variable.')
 
     exit(0)
 
-    # for l in lines:
-    #     l = l.replace('\n', ' ')
-    #
-    #     logging.debug(f'============================================================')
-    #     logging.debug(f'New log line received!: {l}')
-    #     if len(l) > 1:
-    #
-    #         log_line = LogLine(l)
-    #         print('message ', log_line.message)
-    #         print('hostname ', log_line.hostname)
-    #         print('timestamp ', log_line.timestamp)
-    #         print('attempt_ip ', log_line.attempt_ip)
-    #         print('attempt_port ', log_line.attempt_port)
-    #         print('attempt_username ', log_line.attempt_username)
-    #         print('process_id ', log_line.process_id)
-    #         print('process_name ', log_line.process_name)
-    #
-    #     else:
-    #         logging.warning(f'Log line discarded: Size is {len(l)} (<=1)')
+
+def unset_empty_env(vars):
+    """Unset empty environment variables."""
+
+    for v in vars:
+        var = os.getenv(v, None)
+        if not var and var is not None and len(var) == 0:
+            del os.environ[v]
+            logging.warning(f'Environment variable {v} is set but is empty. Unsetted...')
 
 
-
-def exit(exit_code):
-    if exit_code == 0:
-        logging.info(f'Exiting with exit code {exit_code}')
-    else:
-        logging.error(f'Exiting with exit code {exit_code}')
-
-    sys.exit(exit_code)
-
-
-if __name__ == "__main__":
+def logging_setup():
     log_level = os.getenv('LOG_LEVEL', 'info')
 
     if log_level.casefold() == 'debug':
@@ -101,8 +105,38 @@ if __name__ == "__main__":
                         datefmt='%Y-%m-%d %H:%M:%S',
                         level=log_level)
 
+
+def check_vars_exist(vars):
+    """Checks if the required variables exist."""
+
+    vars_missing = []
+    for v in [v for v in vars if vars[v]]:
+        var = os.getenv(v, None)
+        if not var:
+            logging.error(f'Environment variable {v} is not set and its mandatory!')
+            vars_missing.append(v)
+
+    if vars_missing:
+        logging.critical(
+            'Some mandatory environment variables are not set and this can\'t continue. Env variables missing: {}'.format(
+                ', '.join(vars_missing)))
+        raise EnvironmentError('Some mandatory environment variables are not set. Env variables missing: {}'.format(
+            ', '.join(vars_missing)))
+
+
+def exit(exit_code):
+    if exit_code == 0:
+        logging.info(f'Exiting with exit code {exit_code}')
+    else:
+        logging.error(f'Exiting with exit code {exit_code}')
+
+    sys.exit(exit_code)
+
+
+if __name__ == '__main__':
+
     try:
         main()
     except Exception as e:
-        logging.critical('An exception ocurred', exc_info=True)
+        logging.critical('An exception occurred', exc_info=True)
         exit(250)
