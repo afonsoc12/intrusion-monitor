@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 - CI improvements
 - Housekeeping
 
-## v0.0.1 (2021-04-02)
+## v0.0.1 (2021-04-03)
 
 ### Added
 
