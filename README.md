@@ -1,4 +1,4 @@
-![](./res/images/server.png)
+![](https://raw.githubusercontent.com/afonsoc12/intrusion-monitor/master/.github/images/server.png)
 
 # Intrusion Monitor
 [![Docker Pulls](https://img.shields.io/docker/pulls/afonsoc12/intrusion-monitor?logo=docker)](https://hub.docker.com/repository/docker/afonsoc12/intrusion-monitor)
