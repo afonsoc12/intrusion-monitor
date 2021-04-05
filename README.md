@@ -146,7 +146,8 @@ If you would like to know more about environment variables in Docker, please see
 
 The first thing you can do is to disable password authentication on your machine, and opt only for public key authentication.
 
-This method is the most secure type of authentication credentials and uses a pairs of two cryptographically secure keys: a **public key** and a **private key**. You can learn more about this in this article from [SSH.com](https://www.ssh.com/ssh/key/).
+This method is the most secure type of authentication credentials and uses a pairs of two cryptographically secure keys: a **public key** and a **private key**. 
+You can learn more about this in this article from [SSH.com](https://www.ssh.com/ssh/key/).
 
 I also recommend disabling root authentication and changing the port SSH is listening to an uncommon one (don't use any of `22`, `2222`, `32222`, `52222`, and so on).
 
