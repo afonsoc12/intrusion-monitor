@@ -3,8 +3,6 @@ import versioneer
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
-    long_description = '\n'.join(['![](https://raw.githubusercontent.com/afonsoc12/intrusion-monitor/master/res/images/server.png)']
-                        + long_description.split('\n')[1:] )
 
 setuptools.setup(
     name="intrusion-monitor",
