@@ -9,7 +9,6 @@ jobs:
             
   docker-description:
     name: Update Docker Hub description and README
-    if: ${{ github.ref == 'refs/heads/main' && startsWith( github.ref, refs/tags/v ) }} 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

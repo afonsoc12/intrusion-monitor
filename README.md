@@ -156,6 +156,6 @@ Moreover, if you have a "smart" router, configure your firewall to only allow co
 
 Copyright 2021 Afonso Costa
 
-Licensed under the Apache License, Version 2.0 (the "License");
+Licensed under the [Apache License, Version 2.0](https://github.com/afonsoc12/intrusion-monitor/blob/master/LICENSE) (the "License");
 
 <div>Icons made by <a href="https://www.flaticon.com/authors/creaticca-creative-agency" title="Creaticca Creative Agency">Creaticca Creative Agency</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
