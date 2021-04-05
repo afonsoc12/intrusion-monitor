@@ -9,7 +9,7 @@ jobs:
 
   pypi:
     name: Builds python distribution, publishes to TestPyPI
-    if: ${{ github.ref == 'refs/heads/master' && startsWith( github.ref, 'refs/tags/v' ) }}
+    if: ${{ github.ref == 'refs/heads/master' && !startsWith( github.ref, 'refs/tags/v' ) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -42,7 +42,7 @@ jobs:
 
   docker:
     name: Builds docker image and pushes to Docker Hub
-    if: ${{ github.ref == 'refs/heads/master' && startsWith( github.ref, 'refs/tags/v' ) }}
+    if: ${{ github.ref == 'refs/heads/master' && !startsWith( github.ref, 'refs/tags/v' ) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
