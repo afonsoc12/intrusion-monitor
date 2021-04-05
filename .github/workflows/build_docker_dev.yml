@@ -2,17 +2,14 @@ name: CI development
 
 on:
   push:
-    branches:
-      - master
-    tags-ignore:
-      - '**'
-    paths-ignore:
-      - '*'
+    paths:
+      - '*/**.py'      # Run on non-root changes on python files
 
 jobs:
 
   pypi:
     name: Builds python distribution, publishes to TestPyPI
+    if: ${{ github.ref == 'refs/heads/main' && startsWith( github.ref, refs/tags/v ) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -45,6 +42,7 @@ jobs:
 
   docker:
     name: Builds docker image and pushes to Docker Hub
+    if: ${{ github.ref == 'refs/heads/main' && startsWith( github.ref, refs/tags/v ) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -53,6 +51,7 @@ jobs:
           fetch-depth: '0'
       - name: Get version from versioneer
         run: |
+          echo "${{github.ref}}"
           VER=$(echo $(python -c "import versioneer; print(versioneer.get_versions()['version'].replace('+', '-'))"))
           echo "VERSION=$VER" >> $GITHUB_ENV
       - name: Set up QEMU
