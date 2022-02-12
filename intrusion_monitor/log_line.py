@@ -31,18 +31,20 @@ class LogLine:
         prefix, message = self.log_line.split(pid_grp[0]+': ')
 
         logging.debug(f'Log prefix extracted: {prefix}')
-        logging.debug(f'Log prefix extracted: {message}')
+        logging.debug(f'Log message extracted: {message}')
         return prefix, message
 
     def is_login_attempt(self):
-        """Check if the log line is considered a login attempt"""
+        """Check if the log line is considered a login attempt.
+
+           Returns a tuple with two values: line is login attempt and reason to consider as such.
+        """
         possibilities = ('Connection closed by', 'Failed password for', )
 
-        status = [False, None]
+        status = (False, None,)
         for p in possibilities:
             if self.message.startswith(p):
-                status[0] = True
-                status[1] = f'Matches {p}'
+                status = (True, p,)
                 break
 
         return status
@@ -195,5 +197,14 @@ class LogLine:
         logging.debug(f'Username extracted: {username}')
         return username
 
-    def get_ip_info(self):
+    def get_ip_info(self, db):
+        """Gets info for the IP found.
+
+           Before attempting API call, it will search the database for an IP match in the previous week.
+        """
+        #data_db = db.query_last_stored_ip_data(self.attempt_ip)
+        #todo https://realpython.com/caching-external-api-requests/
+       # if data_db:
+
+
         return extract_ip_info(self.attempt_ip)
