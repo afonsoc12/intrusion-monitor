@@ -22,15 +22,21 @@ class InfluxDB:
                                    database=INFLUXDB_DATABASE,
                                    username=INFLUXDB_USER,
                                    password=INFLUXDB_PASSWORD)
-        if self.check_status():
-            # This is safe to use, even if DB exists
-            self.conn.create_database(INFLUXDB_DATABASE)
+        try:
+            ver = self.check_status()
+            logging.info(f'InfluxDB version: {ver}')
+        except TimeoutError:
+            err = 'Unable to gather InfluxDB version due to a timeout'
+            logging.error(err)
+
+        # This is safe to use, even if DB exists
+        self.conn.create_database(INFLUXDB_DATABASE)
 
     def check_status(self):
         """Checks the status of a connection.
 
         Since the ping() of influxDB may return if there is no valid connecton,
-        this forces it to exit after 2 seconds."""
+        this forces it to exit after 3 seconds."""
 
         wait = 3
 
@@ -41,11 +47,11 @@ class InfluxDB:
                 ver = self.conn.ping()
                 logging.debug(f'Got InfluxDB version {ver}')
             except TimeoutError:
-                ver = None
-                logging.error(f'Function timed out. Returning {ver}')
-            except Exception:
-                ver = None
-                logging.error(f'InfluxDB returned an error. Returning {ver}')
+                logging.error(f'Function timed out after waiting {wait} seconds')
+                raise
+            except Exception as e:
+                logging.error(f'InfluxDB returned an error: {e}')
+                raise
 
         return ver
 
@@ -130,5 +136,5 @@ class InfluxDB:
     @staticmethod
     def raise_timeout(signum, frame):
         """Exception for context manager timeout."""
-        raise TimeoutError('Functin timed out')
+        raise TimeoutError
 
