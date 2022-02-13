@@ -8,8 +8,6 @@ on:
       - 'v*'
 
 jobs:
-  pytest:
-    uses: ./.github/workflows/unit_testing.yml
 
   pypi:
     name: Deploy to PyPI
