@@ -1,9 +1,12 @@
 name: Test and deploys releases
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_run:
+    workflows: [Run unit tests]
+      push:
+        tags: 'v*'
+      types:
+        - completed
 
 jobs:
   release:
