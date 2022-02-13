@@ -136,6 +136,10 @@ def _logging_setup(copyright=True, version=True):
     if version:
         logging.info("Version: {}".format(get_versions()["version"]))
 
+    logging.info(
+        "Intrusion Monitor: An SSH log watchdog, which exports failed login attempts to an InfluxDB timeseries database."
+    )
+
 
 def _check_vars_exist(vars):
     """Checks if the required variables exist."""
