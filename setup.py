@@ -15,17 +15,17 @@ setuptools.setup(
     url="https://github.com/afonsoc12/intrusion-monitor",
     packages=setuptools.find_packages(),
     install_requires=[
-        'requests>=2.25.1,<3',
+        'requests-cache>=0.9.1,<1',
         'pygeohash>=1.2.0,<2',
         'influxdb>=5.3.1,<6'
     ],
     entry_points={
         'console_scripts': [
-            'intrusion-monitor = intrusion_monitor.__main__:main'
+            'intrusion-monitor = intrusion_monitor.main'
         ]
     },
     classifiers=[
-        "Development Status :: 5 - Production/Stable",
+        "Development Status :: 3 - Alpha",
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",

@@ -67,7 +67,6 @@ To create a container using the command line:
 docker run -d                                        \
   --name intrusion-monitor                           \
   -e TZ=Europe/London                    `#default`  \
-  -e API_KEY=<Ipstack API KEY>                       \
   -e INFLUXDB_HOST=<InfluxDB Host>                   \
   -e INFLUXDB_PORT=8086                  `#default`  \
   -e INFLUXDB_DATABASE=intrusion-monitor `#default`  \
@@ -91,7 +90,6 @@ services:
         container_name: intrusion-monitor
         environment:
             - TZ=Europe/London                    #default
-            - API_KEY=<IPstack API key>
             - INFLUXDB_HOST=<InfluxDB host>
             - INFLUXDB_PORT=8086                  #default
             - INFLUXDB_DATABASE=intrusion-monitor #default
@@ -125,7 +123,6 @@ If you would like to know more about environment variables in Docker, please see
 | --- | --- | --- | --- |
 | `-e TZ` |  | Specify the system's timezone | Europe/London |
 | `-e OPERATION_MODE` |  | Operation mode | watchdog |
-| `-e API_KEY` | ✔ |[IPstack](https://ipstack.com) API key (don't worry, its free!). | -- |
 | `-e INFLUXDB_HOST` | ✔ | InfluxDB database host. It can be the container name, if both are in the same network. *See [docker-compose.yml](./docker-compose.yml)* | localhost |
 | `-e INFLUXDB_PORT` |  | InfluxDB port | 8086 |
 | `-e INFLUXDB_DATABASE` |  | InfluxDB database name. Creates a new one if does not exist | intrusion-monitor |
@@ -140,6 +137,7 @@ If you would like to know more about environment variables in Docker, please see
 #*Under development*
 #grafana-cli plugins install grafana-piechart-panel
 #grafana-cli plugins install grafana-worldmap-panel
+#grafana-cli plugins install magnesium-wordcloud-panel
 --> 
 
 ## How can I protect myself in the first place?
@@ -154,7 +152,7 @@ Moreover, if you have a "smart" router, configure your firewall to only allow co
 
 ## Credits
 
-Copyright 2021 Afonso Costa
+Copyright 2022 Afonso Costa
 
 Licensed under the [Apache License, Version 2.0](https://github.com/afonsoc12/intrusion-monitor/blob/master/LICENSE) (the "License")
 
