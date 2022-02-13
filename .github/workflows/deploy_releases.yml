@@ -2,7 +2,7 @@ name: Test and deploys releases
 
 on:
   workflow_run:
-    workflows: [Run unit tests]
+    workflows: ['Run unit tests']
       push:
         tags: 'v*'
       types:
