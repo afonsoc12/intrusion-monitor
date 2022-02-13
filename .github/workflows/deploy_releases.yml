@@ -1,12 +1,8 @@
 name: Test and deploys releases
 
 on:
-  workflow_run:
-    workflows: ['unit_testing']
-      push:
-        tags: 'v*'
-      types:
-        - completed
+  push:
+    tags: 'v*'
 
 jobs:
   pytest:

@@ -1,15 +1,11 @@
 name: Test and deploys master
 
 on:
-  workflow_run:
-    workflows: ['unit_testing']
-      push:
-        branches:
-          - master
-        paths:
-          - '*/**.py'      # Run on non-root changes on python files
-      types:
-          - completed
+  push:
+    branches:
+      - master
+    paths:
+      - '*/**.py'      # Run on non-root changes on python files
 
 jobs:
   pytest:
