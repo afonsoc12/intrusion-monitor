@@ -2,8 +2,6 @@ name: Test and deploys releases
 
 on:
   push:
-    branches:
-      - master
     tags:
       - 'v*'
 
@@ -92,3 +90,9 @@ jobs:
             afonsoc12/intrusion-monitor:v${{ env.VERSION }}
             ghcr.io/afonsoc12/intrusion-monitor:latest
             ghcr.io/afonsoc12/intrusion-monitor:v${{ env.VERSION }}
+
+  dummy:
+    name: Dummy step
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout

@@ -96,3 +96,9 @@ jobs:
             afonsoc12/intrusion-monitor:dev-v${{ env.VERSION }}
             ghcr.io/afonsoc12/intrusion-monitor:dev-latest
             ghcr.io/afonsoc12/intrusion-monitor:dev-v${{ env.VERSION }}
+
+  dummy:
+    name: Dummy step
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout
