@@ -4,12 +4,19 @@ import logging
 from datetime import datetime
 import pytz
 
+from .api import api_call
 from .utils import extract_ip_info
 
 TZ = pytz.timezone(os.getenv('TZ', 'Europe/London'))
 TZ_UTC = pytz.utc
 
 class LogLine:
+    failed_possibilities = ['Failed password for invalid user ', # This one must be tested first, otherwise it isnt caught by the next one
+                            'Failed password for ',
+                            'Connection closed by invalid user ',
+                            'Connection closed by authenticating user ',
+                            'Invalid user '
+                     ]
 
     def __init__(self, log_line):
         self.log_line = log_line
@@ -39,10 +46,9 @@ class LogLine:
 
            Returns a tuple with two values: line is login attempt and reason to consider as such.
         """
-        possibilities = ('Connection closed by', 'Failed password for', )
 
         status = (False, None,)
-        for p in possibilities:
+        for p in self.failed_possibilities:
             if self.message.startswith(p):
                 status = (True, p,)
                 break
@@ -172,15 +178,9 @@ class LogLine:
         In all case, the username is always preceeded by either 'for' or 'user'
         """
 
-        possibilities = ['Failed password for invalid user ', # This one must be tested first, otherwise it isnt caught by the next one
-                         'Failed password for ',
-                         'Connection closed by invalid user ',
-                         'Connection closed by authenticating user '
-                         ]
-
         is_found = False
 
-        for p in possibilities:
+        for p in self.failed_possibilities:
             suffix_p = self.message.split(p)
             if len(suffix_p) == 1:
                 logging.debug(f'No matches for username prefix: "{p}"')
@@ -202,9 +202,13 @@ class LogLine:
 
            Before attempting API call, it will search the database for an IP match in the previous week.
         """
-        #data_db = db.query_last_stored_ip_data(self.attempt_ip)
-        #todo https://realpython.com/caching-external-api-requests/
-       # if data_db:
+
+        try:
+            data = api_call(self.attempt_ip)
+            return extract_ip_info(data)
+        except:
+            logging.error('API returned a non 200 code or response is not valid', exc_info=True)
+            return None
 
 
-        return extract_ip_info(self.attempt_ip)
+
