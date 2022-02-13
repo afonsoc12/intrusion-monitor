@@ -9,6 +9,9 @@ on:
         - completed
 
 jobs:
+  pytest:
+    uses: ./.github/workflows/unit_testing.yml
+
   release:
     name: "Tagged Release"
     needs:
@@ -94,8 +97,8 @@ jobs:
             ghcr.io/afonsoc12/intrusion-monitor:latest
             ghcr.io/afonsoc12/intrusion-monitor:v${{ env.VERSION }}
 
-  dummy:
-    name: Dummy step
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@latest
+#  dummy:
+#    name: Dummy step
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@latest
