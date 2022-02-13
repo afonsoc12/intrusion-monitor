@@ -1,0 +1,10 @@
+May  5 16:31:38 server sshd[252]: Connection closed by authenticating user fred 192.0.2.60 port 44470 [preauth]
+May  5 16:33:00 server sshd[90593]: fatal: Timeout before authentication for 192.0.2.60 port 44718
+May  5 17:29:56 server sshd[98884]: Connection closed by authenticating user fred 192.0.2.60 port 45114 [preauth]
+May  5 17:48:54 server sshd[2420]: cert: Authentication tried for fred with valid certificate but not from a permitted source address (192.0.2.61).
+Jan 28 12:42:42 server sshd[26299]: Failed none for fred from 192.0.2.60 port 47366 ssh2
+Mar 14 20:44:04 server sshd[14352]: Connection closed by authenticating user fred 192.0.2.237 port 55051 [preauth]
+Mar 18 21:40:25 server sshd[9942]: fatal: Timeout before authentication for 198.51.100.236 port 53728
+Mar 18 18:54:48 server sshd[54939]: Failed password for root from 201.179.249.231 port 52404 ssh2
+Mar 18 18:55:05 server sshd[38594]: Invalid user ubnt from 201.179.249.231 port 52471
+Mar 18 18:55:05 server sshd[38594]: Failed password for invalid user ubnt from 201.179.249.231 port 52471 ssh2

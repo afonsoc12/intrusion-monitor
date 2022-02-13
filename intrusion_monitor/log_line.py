@@ -5,7 +5,7 @@ from datetime import datetime
 
 import pytz
 
-from .api import api_call
+from .api import api_request_and_process
 from .utils import extract_ip_info
 
 TZ = pytz.timezone(os.getenv("TZ", "Europe/London"))
@@ -231,7 +231,7 @@ class LogLine:
         """
 
         try:
-            data = api_call(self.attempt_ip)
+            data = api_request_and_process(self.attempt_ip)
             return extract_ip_info(data)
         except:
             logging.error(
