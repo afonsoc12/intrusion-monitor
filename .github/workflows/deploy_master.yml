@@ -101,4 +101,4 @@ jobs:
     name: Dummy step
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout
+      - uses: actions/checkout@latest
