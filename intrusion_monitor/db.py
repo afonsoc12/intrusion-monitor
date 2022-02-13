@@ -1,113 +1,107 @@
 import logging
 import os
 import signal
-from asyncio.subprocess import Process
 from contextlib import contextmanager
 from datetime import datetime
 
 from influxdb import InfluxDBClient
 
-INFLUXDB_HOST = os.getenv('INFLUXDB_HOST', 'localhost')
-INFLUXDB_PORT = os.getenv('INFLUXDB_PORT', '8086')
-INFLUXDB_DATABASE = os.getenv('INFLUXDB_DATABASE', 'intrusion_monitor')
-INFLUXDB_USER = os.getenv('INFLUXDB_USER')
-INFLUXDB_PASSWORD = os.getenv('INFLUXDB_PASSWORD')
+from .log_line import LogLine
+
+INFLUXDB_HOST = os.getenv("INFLUXDB_HOST", "localhost")
+INFLUXDB_PORT = os.getenv("INFLUXDB_PORT", "8086")
+INFLUXDB_DATABASE = os.getenv("INFLUXDB_DATABASE", "intrusion_monitor")
+INFLUXDB_USER = os.getenv("INFLUXDB_USER")
+INFLUXDB_PASSWORD = os.getenv("INFLUXDB_PASSWORD")
+
 
 class InfluxDB:
-
     def __init__(self):
-        logging.debug('Creating InfluxDB client instance...')
-        self.conn = InfluxDBClient(host=INFLUXDB_HOST,
-                                   port=INFLUXDB_PORT,
-                                   database=INFLUXDB_DATABASE,
-                                   username=INFLUXDB_USER,
-                                   password=INFLUXDB_PASSWORD)
-        if self.check_status():
-            # This is safe to use, even if DB exists
-            self.conn.create_database(INFLUXDB_DATABASE)
+        logging.debug("Creating InfluxDB client instance...")
+        self.conn = InfluxDBClient(
+            host=INFLUXDB_HOST,
+            port=INFLUXDB_PORT,
+            database=INFLUXDB_DATABASE,
+            username=INFLUXDB_USER,
+            password=INFLUXDB_PASSWORD,
+        )
+        try:
+            ver = self.check_status()
+            logging.info(f"InfluxDB version: {ver}")
+        except TimeoutError:
+            err = "Unable to gather InfluxDB version due to a timeout"
+            logging.error(err)
+
+        # This is safe to use, even if DB exists
+        self.conn.create_database(INFLUXDB_DATABASE)
 
     def check_status(self):
         """Checks the status of a connection.
 
         Since the ping() of influxDB may return if there is no valid connecton,
-        this forces it to exit after 2 seconds."""
+        this forces it to exit after 3 seconds."""
 
         wait = 3
 
-        logging.debug(f'Attempting connection version. Timeout in {wait} seconds...')
+        logging.debug(f"Attempting connection version. Timeout in {wait} seconds...")
         # Add a timeout block.
         with self.timeout(wait) as e:
             try:
                 ver = self.conn.ping()
-                logging.debug(f'Got InfluxDB version {ver}')
+                logging.debug(f"Got InfluxDB version {ver}")
             except TimeoutError:
-                ver = None
-                logging.error(f'Function timed out. Returning {ver}')
-            except Exception:
-                ver = None
-                logging.error(f'InfluxDB returned an error. Returning {ver}')
+                logging.error(f"Function timed out after waiting {wait} seconds")
+                raise
+            except Exception as e:
+                logging.error(f"InfluxDB returned an error: {e}")
+                raise
 
         return ver
 
+    def query_last_stored_ip_data(self, ip, time="1w"):
+        q = f"select * from failed_logins where ip='{ip}' and time >  now() - {time} order by time desc limit 1;"
 
+        res = list(self.conn.query(q))
 
-    def write_log_line(self, log_line, ip_info):
-        if not ip_info:
-            logging.debug('IP info is not available. Discarding')
-            measure = [
-                {
-                    "measurement": "failed_logins",
-                    "tags": {
-                        "username": log_line.attempt_username,
-                        "port": log_line.attempt_port,
-                        "ip": log_line.attempt_ip
-                    },
-                    "fields": {
-                        "value": 1
-                    }
-                }
-            ]
+        if len(res) > 0:
+            res = res[0][0]
 
         else:
-            logging.debug('IP info is available')
-            measure = [
-                {
-                    "measurement": "failed_logins",
-                    "tags": {
-                        "geohash": ip_info['geohash'],
-                        "latitude": ip_info['latitude'],
-                        "longitude": ip_info['longitude'],
-                        "username": log_line.attempt_username,
-                        "port": log_line.attempt_port,
-                        "ip": log_line.attempt_ip,
-                        'type': ip_info['type'],
-                        'continent_code': ip_info['continent_code'],
-                        'continent_name': ip_info['continent_name'],
-                        'country_code': ip_info['country_code'],
-                        'country_name': ip_info['country_name'],
-                        'region_code': ip_info['region_code'],
-                        'region_name': ip_info['region_name'],
-                        'city': ip_info['city'],
-                        'zip': ip_info['zip'],
-                        'country_flag_emoji': ip_info['location']['country_flag_emoji'],
-                        'capital': ip_info['location']['capital'],
-                        'calling_code': ip_info['location']['calling_code'],
-                        'is_eu': ip_info['location']['is_eu']
-                    },
-                    "fields": {
-                        "value": 1
-                    }
-                }
-            ]
+            # No results
+            pass
+        return 1
 
-        if log_line.timestamp and isinstance(log_line.timestamp, datetime):
-            logging.debug('Setting timestamp, since it is available')
-            measure[0]['time'] = log_line.timestamp.strftime('%Y-%m-%dT%H:%M:%SZ')
+    def write_log_line(self, log_line: LogLine, ip_info: dict):
 
-        self.conn.write_points(measure)
+        #
+        measure = {
+            "measurement": "failed_logins",
+            "tags": {
+                "host": log_line.hostname,
+                "log_process_name": log_line.process_name,
+                "log_process_id": log_line.process_id,
+                "log_line": log_line.log_line,
+                "username": log_line.attempt_username,
+                "port": log_line.attempt_port,
+                "ip": log_line.attempt_ip,
+            },
+            "fields": {"success": 0},
+        }
 
-        return measure
+        # If ip_info available, extend tags
+        if ip_info:
+            measure["api_response"] = ip_info
+            measure["tags"] = {**measure["tags"], **ip_info}
 
+        log_line_timestamp = log_line.timestamp
+        if log_line_timestamp and isinstance(log_line_timestamp, datetime):
+            logging.debug("Setting timestamp, since it is available")
+            measure["time"] = log_line_timestamp.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        logging.debug(f"Generated measure to be inserted: {measure}")
+        status = self.conn.write_points([measure])
+
+        return status
 
     @staticmethod
     @contextmanager
@@ -130,5 +124,4 @@ class InfluxDB:
     @staticmethod
     def raise_timeout(signum, frame):
         """Exception for context manager timeout."""
-        raise TimeoutError('Functin timed out')
-
+        raise TimeoutError

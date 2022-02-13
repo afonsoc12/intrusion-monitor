@@ -9,7 +9,6 @@ from influxdb import InfluxDBClient
 HOST = '0.0.0.0'  # Standard loopback interface address (localhost)
 PORT = 7007        # Port to listen on (non-privileged ports are > 1023)
 
-apikey   = os.getenv("API_KEY")
 influxHost   = os.getenv("INFLUX_HOST")
 influxPort   = os.getenv("INFLUX_PORT")
 influxDatabase   = os.getenv("INFLUX_DB")

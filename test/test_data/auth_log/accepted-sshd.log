@@ -1,0 +1,7 @@
+Mar 14 19:50:59 server sshd[18884]: Accepted password for fred from 192.0.2.60 port 6647 ssh2
+Mar 14 19:52:04 server sshd[5197]: Accepted publickey for fred from 192.0.2.60 port 59915 ssh2: RSA SHA256:5xyQ+PG1Z3CIiShclJ2iNya5TOdKDgE/HrOXr21IdOo
+May 15 16:28:17 server sshd[50140]: Accepted publickey for fred from 192.0.2.60 port 44456 ssh2: ECDSA-CERT SHA256:qGl9KiyXrG6mIOo1CT01oHUvod7Ngs5VMHM14DTbxzI ID foobar (serial 9624) CA ED25519 SHA256:fZ6L7TlBLqf1pGWzkcQMQMFZ+aGgrtYgRM90XO0gzZ8
+Jan 28 11:51:43 server sshd[5104]: Accepted publickey for fred from 192.0.2.60 port 60594 ssh2: RSA e8:31:68:c7:01:2d:25:20:36:8f:50:5d:f9:ee:70:4c
+Jan 28 11:52:05 server sshd[1003]: Accepted publickey for fred from 192.0.2.60 port 20042 ssh2
+Mar 14 20:14:18 server sshd[19850]: Accepted password for fred from 192.0.2.60 port 59946 ssh2
+Mar 14 20:20:53 server sshd[10091]: Accepted publickey for fred from 192.0.2.60 port 59941 ssh2: RSA SHA256:LI/TSnwoLryuYisAnNEIedVBXwl/XsrXjli9Qw9SmwI
