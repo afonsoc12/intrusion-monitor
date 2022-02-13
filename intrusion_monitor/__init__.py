@@ -33,7 +33,7 @@ def _real_main():
     # Check if required variables are present
     _check_vars_exist(ENVIRONMENT_VARS)
 
-    # Select if working as a TCP socket (for rsyslog) or as log watchdog (default)
+    # Select if working as a TCP socket (for rsyslog) or as a log watchdog (default)
     OPERATION_MODE = os.getenv("OPERATION_MODE")
     if not OPERATION_MODE:
         logging.warning('OPERATION_MODE variable is not set. Defaulting to "watchdog"')
