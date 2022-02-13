@@ -1,4 +1,4 @@
-name: CI development
+name: Builds and deploys to TestPyPi and Docker for non tagged master commits
 
 on:
   push:
@@ -6,6 +6,8 @@ on:
       - '*/**.py'      # Run on non-root changes on python files
 
 jobs:
+  pytest:
+    uses: ./.github/workflows/unit_testing.yml
 
   pypi:
     name: Builds python distribution, publishes to TestPyPI
@@ -22,6 +24,7 @@ jobs:
           echo "VERSION=$VER" >> $GITHUB_ENV
       - name: Install pypa/build and build a binary wheel and a source tarball
         run: |
+          python -m pip install --upgrade pip
           python -m pip install build --user
           python -m build --sdist --wheel --outdir dist/ .
       - name: Publish distribution 📦 to TestPyPI
