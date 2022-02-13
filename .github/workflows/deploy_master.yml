@@ -1,13 +1,19 @@
-name: CI releases
+name: Test and deploys master
 
 on:
   push:
-    tags:
-      - 'v*'
+    paths:
+      - '*/**.py'      # Run on non-root changes on python files
 
 jobs:
+  pytest:
+    uses: ./.github/workflows/unit_testing.yml
+
   pypi:
-    name: Builds python distribution, publishes to PyPI
+    name: Builds python distribution, publishes to TestPyPI
+    if: ${{ github.ref == 'refs/heads/master' && !startsWith( github.ref, 'refs/tags/v' ) }}
+    needs:
+      - pytest
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,22 +29,25 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install build --user
           python -m build --sdist --wheel --outdir dist/ .
-      - name: Publish distribution 📦 to PyPI
+      - name: Publish distribution 📦 to TestPyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
-      - name: Create Github release
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+      - name: Create Github release (pre-release)
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
-          title: "v${{ env.VERSION }}"
+          automatic_release_tag: "dev-latest"
+          prerelease: true
+          title: "dev-v${{ env.VERSION }}"
           files: |
             LICENSE
             dist/intrusion*
 
   docker:
     name: Builds docker image and pushes to Docker Hub
+    if: ${{ github.ref == 'refs/heads/master' && !startsWith( github.ref, 'refs/tags/v' ) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -47,6 +56,7 @@ jobs:
           fetch-depth: '0'
       - name: Get version from versioneer
         run: |
+          echo "${{github.ref}}"
           VER=$(echo $(python -c "import versioneer; print(versioneer.get_versions()['version'].replace('+', '-'))"))
           echo "VERSION=$VER" >> $GITHUB_ENV
       - name: Set up QEMU
@@ -70,12 +80,11 @@ jobs:
           context: .
           file: Dockerfile
           build-args: |
-            VERSION=${{ env.VERSION }}
-          no-cache: true
+            VERSION=dev-v${{ env.VERSION }}
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            afonsoc12/intrusion-monitor:latest
-            afonsoc12/intrusion-monitor:v${{ env.VERSION }}
-            ghcr.io/afonsoc12/intrusion-monitor:latest
-            ghcr.io/afonsoc12/intrusion-monitor:v${{ env.VERSION }}
+            afonsoc12/intrusion-monitor:dev-latest
+            afonsoc12/intrusion-monitor:dev-v${{ env.VERSION }}
+            ghcr.io/afonsoc12/intrusion-monitor:dev-latest
+            ghcr.io/afonsoc12/intrusion-monitor:dev-v${{ env.VERSION }}
