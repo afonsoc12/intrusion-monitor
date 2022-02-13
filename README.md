@@ -9,6 +9,8 @@
 [![Github Starts](https://img.shields.io/github/stars/afonsoc12/intrusion-monitor?logo=github)](https://github.com/afonsoc12/intrusion-monitor)
 [![Github Fork](https://img.shields.io/github/forks/afonsoc12/intrusion-monitor?logo=github)](https://github.com/afonsoc12/intrusion-monitor)
 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 An SSH log watchdog, which exports failed login attempts to an InfluxDB timeseries database.
 
 ## Introduction

@@ -1,7 +1,6 @@
 import logging
 import os
 import signal
-from asyncio.subprocess import Process
 from contextlib import contextmanager
 from datetime import datetime
 
@@ -9,26 +8,28 @@ from influxdb import InfluxDBClient
 
 from .log_line import LogLine
 
-INFLUXDB_HOST = os.getenv('INFLUXDB_HOST', 'localhost')
-INFLUXDB_PORT = os.getenv('INFLUXDB_PORT', '8086')
-INFLUXDB_DATABASE = os.getenv('INFLUXDB_DATABASE', 'intrusion_monitor')
-INFLUXDB_USER = os.getenv('INFLUXDB_USER')
-INFLUXDB_PASSWORD = os.getenv('INFLUXDB_PASSWORD')
+INFLUXDB_HOST = os.getenv("INFLUXDB_HOST", "localhost")
+INFLUXDB_PORT = os.getenv("INFLUXDB_PORT", "8086")
+INFLUXDB_DATABASE = os.getenv("INFLUXDB_DATABASE", "intrusion_monitor")
+INFLUXDB_USER = os.getenv("INFLUXDB_USER")
+INFLUXDB_PASSWORD = os.getenv("INFLUXDB_PASSWORD")
+
 
 class InfluxDB:
-
     def __init__(self):
-        logging.debug('Creating InfluxDB client instance...')
-        self.conn = InfluxDBClient(host=INFLUXDB_HOST,
-                                   port=INFLUXDB_PORT,
-                                   database=INFLUXDB_DATABASE,
-                                   username=INFLUXDB_USER,
-                                   password=INFLUXDB_PASSWORD)
+        logging.debug("Creating InfluxDB client instance...")
+        self.conn = InfluxDBClient(
+            host=INFLUXDB_HOST,
+            port=INFLUXDB_PORT,
+            database=INFLUXDB_DATABASE,
+            username=INFLUXDB_USER,
+            password=INFLUXDB_PASSWORD,
+        )
         try:
             ver = self.check_status()
-            logging.info(f'InfluxDB version: {ver}')
+            logging.info(f"InfluxDB version: {ver}")
         except TimeoutError:
-            err = 'Unable to gather InfluxDB version due to a timeout'
+            err = "Unable to gather InfluxDB version due to a timeout"
             logging.error(err)
 
         # This is safe to use, even if DB exists
@@ -42,23 +43,23 @@ class InfluxDB:
 
         wait = 3
 
-        logging.debug(f'Attempting connection version. Timeout in {wait} seconds...')
+        logging.debug(f"Attempting connection version. Timeout in {wait} seconds...")
         # Add a timeout block.
         with self.timeout(wait) as e:
             try:
                 ver = self.conn.ping()
-                logging.debug(f'Got InfluxDB version {ver}')
+                logging.debug(f"Got InfluxDB version {ver}")
             except TimeoutError:
-                logging.error(f'Function timed out after waiting {wait} seconds')
+                logging.error(f"Function timed out after waiting {wait} seconds")
                 raise
             except Exception as e:
-                logging.error(f'InfluxDB returned an error: {e}')
+                logging.error(f"InfluxDB returned an error: {e}")
                 raise
 
         return ver
 
-    def query_last_stored_ip_data(self, ip, time='1w'):
-        q = f'select * from failed_logins where ip=\'{ip}\' and time >  now() - {time} order by time desc limit 1;'
+    def query_last_stored_ip_data(self, ip, time="1w"):
+        q = f"select * from failed_logins where ip='{ip}' and time >  now() - {time} order by time desc limit 1;"
 
         res = list(self.conn.query(q))
 
@@ -74,36 +75,33 @@ class InfluxDB:
 
         #
         measure = {
-                "measurement": "failed_logins",
-                "tags": {
-                    "host": log_line.hostname,
-                    "log_process_name": log_line.process_name,
-                    "log_process_id": log_line.process_id,
-                    "log_line": log_line.log_line,
-                    "username": log_line.attempt_username,
-                    "port": log_line.attempt_port,
-                    "ip": log_line.attempt_ip
-                },
-                "fields": {
-                    "success": 0
-                }
-            }
+            "measurement": "failed_logins",
+            "tags": {
+                "host": log_line.hostname,
+                "log_process_name": log_line.process_name,
+                "log_process_id": log_line.process_id,
+                "log_line": log_line.log_line,
+                "username": log_line.attempt_username,
+                "port": log_line.attempt_port,
+                "ip": log_line.attempt_ip,
+            },
+            "fields": {"success": 0},
+        }
 
         # If ip_info available, extend tags
         if ip_info:
             measure["api_response"] = ip_info
-            measure['tags'] = {**measure['tags'], **ip_info}
+            measure["tags"] = {**measure["tags"], **ip_info}
 
         log_line_timestamp = log_line.timestamp
         if log_line_timestamp and isinstance(log_line_timestamp, datetime):
-            logging.debug('Setting timestamp, since it is available')
-            measure['time'] = log_line_timestamp.strftime('%Y-%m-%dT%H:%M:%SZ')
+            logging.debug("Setting timestamp, since it is available")
+            measure["time"] = log_line_timestamp.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-        logging.debug(f'Generated measure to be inserted: {measure}')
+        logging.debug(f"Generated measure to be inserted: {measure}")
         status = self.conn.write_points([measure])
 
         return status
-
 
     @staticmethod
     @contextmanager
@@ -127,4 +125,3 @@ class InfluxDB:
     def raise_timeout(signum, frame):
         """Exception for context manager timeout."""
         raise TimeoutError
-
