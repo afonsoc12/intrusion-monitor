@@ -2,14 +2,14 @@ name: Test and deploys master
 
 on:
   workflow_run:
-    workflows: [ Run unit tests ]
+    workflows: [Run unit tests]
       push:
         branches:
           - master
         paths:
           - '*/**.py'      # Run on non-root changes on python files
-    types:
-        - completed
+      types:
+          - completed
 
 jobs:
   pre-release:
@@ -105,4 +105,4 @@ jobs:
     name: Dummy step
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@latest
+      - uses: actions/checkout
