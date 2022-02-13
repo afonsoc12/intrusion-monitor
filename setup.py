@@ -21,7 +21,7 @@ setuptools.setup(
     ],
     entry_points={
         'console_scripts': [
-            'intrusion-monitor = intrusion_monitor.main'
+            'intrusion-monitor = intrusion_monitor:main'
         ]
     },
     classifiers=[
