@@ -12,7 +12,7 @@ jobs:
     uses: ./.github/workflows/unit_testing.yml
 
   pypi:
-    name: Builds python distribution, publishes to PyPI
+    name: Deploy to PyPI
     needs:
       - pytest
     runs-on: ubuntu-latest
@@ -45,7 +45,7 @@ jobs:
             dist/intrusion*
 
   docker:
-    name: Builds docker image and pushes to Docker Hub
+    name: Deploy to Docker Hub (latest)
     needs:
       - pytest
     runs-on: ubuntu-latest
