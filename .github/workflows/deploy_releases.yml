@@ -2,6 +2,8 @@ name: Test and deploys releases
 
 on:
   push:
+    branches:
+      - master
     tags:
       - 'v*'
 
