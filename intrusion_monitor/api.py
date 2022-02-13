@@ -37,7 +37,7 @@ def api_call(ip, fields_id=66846719):
         - query
     """
 
-    req_str = f'https://ip-api.com/json/{ip}?fields={fields_id}'
+    req_str = f'http://ip-api.com/json/{ip}?fields={fields_id}'
 
     try:
         logging.debug(f'Trying API connection on {req_str}')
