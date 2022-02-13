@@ -2,40 +2,25 @@ import os
 import logging
 from pprint import pprint
 
-import requests
+from requests_cache import CachedSession
 import pygeohash
 
-def extract_ip_info(ip):
-    api_key = os.getenv('API_KEY')
-    req_str = 'http://api.ipstack.com/{ip}?access_key={apikey}'
+rc = CachedSession('intrusion_monitor_http_cache', backend='sqlite', use_temp=True, expire_after=604800)
 
-    try:
-        logging.debug('Trying API connection on {}'.format(req_str.format(ip=ip, apikey='XXXX')))
-        req = requests.get(req_str.format(ip=ip, apikey=api_key))
-        logging.debug(f'\t> Got HTTP code {req.status_code}')
-    except:
-        logging.error(f'Something occurred while getting API connection...')
+def extract_ip_info(data):
+
+    # Data in json but API returned an error
+    if data['status'] == 'success':
+        logging.debug(f'\t> API response valid and "status" is {data["status"]}. API response: \n{data}')
+        data['geohash'] = compute_geohash(data['lat'], data['lon'])
+        if data['geohash']:
+            logging.debug(f'\t> Geohash computed is: {data["geohash"]}')
+        else:
+            logging.error(f'\t> Unable to compute geohash for ip={data["ip"]}; latitude={data["latitude"]}; longitude={data["longitude"]}')
+    else:
+        logging.error(f'\t> API response is valid but "status" is {data["status"]}. Message: {data["message"]}')
         return None
 
-    if req.status_code == 200:
-        try:
-            data = req.json()
-            logging.debug(f'\t> Data parsed to json')
-        except:
-            logging.error(f'\t> An error occurred parsing API data to json. Data starts with: {req.text[0:20]}')
-            return None
-
-        # Data in json but API returned an error
-        if 'status' in data and not data['success']:
-            logging.error(f'\t> API returned an error. API response: \n{pprint(data)}')
-            return None
-        else:
-            logging.debug(f'\t> API response is valid. API response: \n{data}')
-            data['geohash'] = compute_geohash(data['latitude'], data['longitude'])
-            logging.debug('\t> Geohash computed is: {}'.format(data['geohash']))
-
-    else:
-        logging.error(f'\t> An error occurred parsing API data to json. Data starts with: {req.text[0:20]}')
 
     return data
 

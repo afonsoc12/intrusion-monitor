@@ -9,7 +9,6 @@ from .watchdog import Watchdog
 
 # Environment variables and if they are required
 ENVIRONMENT_VARS = {'TZ': False,
-                    'API_KEY': True,
                     'INFLUXDB_HOST': False,
                     'INFLUXDB_PORT': False,
                     'INFLUXDB_DATABASE': False,
