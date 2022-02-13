@@ -4,8 +4,7 @@ from pathlib import Path
 import pytest
 import requests
 
-import api
-from intrusion_monitor.api import process_request
+from intrusion_monitor.api import process_request, url_builder
 
 test_data = Path(__file__).parent.joinpath("test_data")
 
@@ -70,7 +69,7 @@ class TestProcessRequestClass:
 
 class TestIpApiHealthClass:
     def test_api_connection(self):
-        url_str = api.url_builder(ip=None, base_url=True)
+        url_str = url_builder(ip=None, base_url=True)
 
         req = requests.get(url_str)
         req_json = req.json()
@@ -78,7 +77,7 @@ class TestIpApiHealthClass:
         assert req.status_code == 200 and req_json["status"] == "success"
 
     def test_api_returns_expected(self):
-        url_str = api.url_builder(ip="1.1.1.1", fields_id=66846719)
+        url_str = url_builder(ip="1.1.1.1", fields_id=66846719)
 
         req_json = requests.get(url_str).json()
 
