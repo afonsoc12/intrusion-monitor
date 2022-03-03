@@ -11,27 +11,6 @@ jobs:
   pytest:
     uses: ./.github/workflows/unit_testing.yml
 
-  pre-release:
-    name: "Pre Release"
-    needs:
-      - pytest
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get version from versioneer
-        run: |
-          VER=$(echo $(python -c "import versioneer; print(versioneer.get_versions()['version'].replace('+', '-'))"))
-          echo "VERSION=$VER" >> $GITHUB_ENV
-      - name: Create Github release (pre-release)
-        uses: marvinpinto/action-automatic-releases@latest
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "dev-latest"
-          prerelease: true
-          title: "dev-v${{ env.VERSION }}"
-          files: |
-            LICENSE
-            dist/intrusion*
-
   pypi:
     name: Deploy to TestPyPI
     needs:
@@ -57,6 +36,16 @@ jobs:
         with:
           password: ${{ secrets.TEST_PYPI_API_TOKEN }}
           repository_url: https://test.pypi.org/legacy/
+      - name: Create Github release (pre-release)
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "dev-latest"
+          prerelease: true
+          title: "dev-v${{ env.VERSION }}"
+          files: |
+            LICENSE
+            dist/intrusion*
 
   docker:
     name: Deploy to Docker Hub (dev-latest)
@@ -103,9 +92,3 @@ jobs:
             afonsoc12/intrusion-monitor:dev-v${{ env.VERSION }}
             ghcr.io/afonsoc12/intrusion-monitor:dev-latest
             ghcr.io/afonsoc12/intrusion-monitor:dev-v${{ env.VERSION }}
-
-#  dummy:
-#    name: Dummy step
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@latest

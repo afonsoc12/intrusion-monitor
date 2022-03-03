@@ -1,22 +1,24 @@
-FROM python:3.7-alpine
+FROM python:3.8-alpine
+
+LABEL maintainer="Afonso Costa (@afonsoc12)"
 
 ARG VERSION="n/a"
+ENV XDG_CONFIG_HOME=/config
+ENV TZ=Europe/Lisbon
 
 LABEL VERSION=${VERSION}
-
-MAINTAINER Afonso Costa
 
 WORKDIR /src
 
 COPY . .
 
-RUN echo -e "def get_versions():\n    return {'version': '${VERSION}', 'full-revisionid': 'n/a', 'date': 'n/a', 'dirty': 'n/a', 'error': 'n/a'}" \
-    > intrusion_monitor/_version.py
-
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt && \
+RUN apk update && \
+    apk add tzdata && \
+    echo -e "def get_versions():\n    return {'version': '${VERSION}', 'full-revisionid': 'n/a', 'date': 'n/a', 'dirty': 'n/a', 'error': 'n/a'}" \
+    > firefly_cli/_version.py && \
+    pip install --upgrade pip && \
     pip install .
 
 #EXPOSE 7007
 
-ENTRYPOINT [ "python", "-m", "intrusion_monitor" ]
+CMD intrusion-monitor
